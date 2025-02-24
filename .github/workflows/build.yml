@@ -37,7 +37,7 @@ jobs:
         with:
           files: dist/win/**/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Upload macOS Build to GitHub Release
         if: runner.os == 'macOS'
@@ -45,4 +45,4 @@ jobs:
         with:
           files: dist/mac/**/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
