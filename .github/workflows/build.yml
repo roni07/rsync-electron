@@ -21,12 +21,12 @@ jobs:
 
       - name: Cleanup Old Artifacts (Windows)
         if: runner.os == 'Windows'
-        run: Remove-Item -Path dist -Recurse -Force
+        run: if (Test-Path dist) { Remove-Item -Path dist -Recurse -Force }
         shell: pwsh
 
       - name: Cleanup Old Artifacts (macOS)
         if: runner.os == 'macOS'
-        run: rm -rf dist/
+        run: rm -rf dist || true
 
       - name: Build for Windows
         if: runner.os == 'Windows'
