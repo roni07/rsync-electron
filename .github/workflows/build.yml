@@ -27,7 +27,7 @@ jobs:
 
       - name: Build for macOS
         if: runner.os == 'macOS'
-        run: npm run electron-builder -- --mac --arm64 --dmg --publish never
+        run: npm run electron-builder -- --mac --arm64 --publish never
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN}}
 
