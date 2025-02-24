@@ -26,6 +26,10 @@ jobs:
       - name: Build Electron App
         run: npm run build  # Make sure you have this script in your package.json
 
+      # Debug step to print environment variables
+      - name: Print environment variables
+        run: printenv
+
       - name: Package Electron App
         run: npm run package  # Ensure you have a packaging script (like electron-builder or electron-forge)
 
@@ -34,4 +38,4 @@ jobs:
         with:
           files: 'dist/**/*.exe'  # Ensure this matches your build output directory structure
         env:
-          TOKEN: ${{ secrets.TOKEN }}  # Use the correct GitHub token
+          GH_TOKEN: ${{ secrets.TOKEN }}  # Use the correct GitHub token
