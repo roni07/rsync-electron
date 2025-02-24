@@ -24,7 +24,7 @@
   },
   "build": {
     "asar": true,
-    "publish": "never",
+    "publish": null,
     "files": [
       "!node_modules/.bin",
       "!node_modules/**/test",
