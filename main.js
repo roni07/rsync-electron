@@ -6,14 +6,39 @@
  * Email: mdmehedihasanroni28@gmail.com
  */
 
-const { app } = require("electron");
+const { ipcMain } = require("electron");
+const { app, BrowserWindow } = require("electron");
 const { exec } = require("child_process");
 const path = require("path");
-const fs = require("fs");
 
 // Set your sync source and target (Update these paths)
 const SOURCE_DIR = "/path/to/source"; // Update with your local folder
 const DESTINATION = "user@server:/path/to/destination"; // Update with your remote storage
+
+let mainWindow;
+
+ipcMain.on("sync-files", (event) => {
+    syncFiles();
+    event.reply("sync-status", "Sync started successfully!");
+});
+
+// Function to create the Home Page window
+function createWindow() {
+    mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true, // Enable if you need to use Node.js in the frontend
+        },
+    });
+
+    // Load an HTML file (frontend)
+    mainWindow.loadFile("index.html");
+
+    mainWindow.on("closed", () => {
+        mainWindow = null;
+    });
+}
 
 // Function to run rsync
 function syncFiles() {
@@ -34,20 +59,21 @@ function syncFiles() {
 
 // Run on startup
 app.whenReady().then(() => {
-    console.log("Electron Background Service Started...");
+    console.log("Electron App Started...");
+
+    // Show Home Page
+    createWindow();
 
     // Run rsync immediately
     syncFiles();
 
     // Schedule sync every 10 minutes (adjust as needed)
     setInterval(syncFiles, 10 * 60 * 1000);
-
-    // Prevent Electron from creating a window
-    app.dock?.hide(); // Hide from macOS dock
-    app.quit(); // Quit the app after scheduling (runs in background)
 });
 
 // Prevent app from closing
-app.on("window-all-closed", (e) => {
-    e.preventDefault();
+app.on("window-all-closed", () => {
+    if (process.platform !== "darwin") {
+        app.quit();
+    }
 });
