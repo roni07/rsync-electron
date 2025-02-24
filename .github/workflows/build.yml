@@ -38,4 +38,4 @@ jobs:
         with:
           files: 'dist/**/*.exe'  # Ensure this matches your build output directory structure
         env:
-          GH_TOKEN: ${{ secrets.TOKEN }}  # Use the correct GitHub token
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the correct GitHub token
