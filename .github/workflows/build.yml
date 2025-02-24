@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 20.12.0
 
       - name: Install Dependencies
         run: npm install
@@ -29,6 +29,6 @@ jobs:
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v1
         with:
-          files: 'path_to_your_exe_or_dist_directory/*.exe'
+          files: 'dist/**/*.exe'  # Ensure this matches your build output directory structure
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Use the correct GitHub token
