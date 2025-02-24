@@ -21,12 +21,28 @@ jobs:
 
       - name: Build for Windows
         if: runner.os == 'Windows'
-        run: npm run electron-builder -- --win --x64
+        run: npm run electron-builder -- --win --x64 --publish never
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Build for macOS
         if: runner.os == 'macOS'
-        run: npm run electron-builder -- --mac --arm64
+        run: npm run electron-builder -- --mac --arm64 --dmg --publish never
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN}}
+
+      - name: Upload Windows Build to GitHub Release
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/win/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload macOS Build to GitHub Release
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/mac/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
