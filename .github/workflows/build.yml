@@ -17,6 +17,9 @@ jobs:
         with:
           node-version: 20.12.0
 
+      - name: Check token
+        run: echo "The token is ${{ secrets.TOKEN }}"
+
       - name: Install Dependencies
         run: npm install
 
@@ -25,9 +28,6 @@ jobs:
 
       - name: Package Electron App
         run: npm run package  # Ensure you have a packaging script (like electron-builder or electron-forge)
-
-      - name: Check token
-        run: echo "The token is ${{ secrets.TOKEN }}"
 
       - name: Upload to GitHub Releases
         uses: softprops/action-gh-release@v1
