@@ -41,7 +41,6 @@
       "target": ["dmg", "zip"],
       "icon": "build/icon.icns",
       "hardenedRuntime": true
-    },
-    "publish": "never"
+    }
   }
 }
