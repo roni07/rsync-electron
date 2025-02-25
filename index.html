@@ -7,35 +7,59 @@
 </head>
 <body>
 <h2>File Sync Using Rsync</h2>
-<button id="selectFile">Select File</button>
-<p id="selectedFile">No file selected</p>
 
-<input type="password" id="passwordInput" placeholder="Enter SSH Password" />
-<button id="syncFile">Sync File</button>
+<input type="password" id="passwordInput" placeholder="Enter SSH Password"/>
+<button id="syncPush">Sync Push</button>
+<button id="syncPull">Sync Pull</button>
+<button id="syncBoth">Sync</button>
 <p id="syncStatus"></p>
 
 <script>
-    const { ipcRenderer } = require("electron");
+    const {ipcRenderer} = require("electron");
 
-    document.getElementById("selectFile").addEventListener("click", () => {
-        ipcRenderer.send("select-file");
-    });
+    document.getElementById("syncPush").addEventListener("click", () => {
 
-    ipcRenderer.on("file-selected", (event, filePath) => {
-        document.getElementById("selectedFile").textContent = `Selected File: ${filePath}`;
-        document.getElementById("selectedFile").dataset.path = filePath;
-    });
-
-    document.getElementById("syncFile").addEventListener("click", () => {
-        const filePath = document.getElementById("selectedFile").dataset.path;
+        const statusText = document.getElementById("syncStatus");
         const password = document.getElementById("passwordInput").value;
 
-        if (!filePath || !password) {
-            document.getElementById("syncStatus").textContent = "Please select a file and enter a password.";
+        if (!password) {
+            statusText.textContent = "Please enter your password";
             return;
         }
 
-        ipcRenderer.send("sync-file", { filePath, password });
+        statusText.textContent = "🔄 Syncing... Please wait.";
+
+        ipcRenderer.send("sync-push", {password});
+    });
+
+    document.getElementById("syncPull").addEventListener("click", () => {
+
+        const statusText = document.getElementById("syncStatus");
+        const password = document.getElementById("passwordInput").value;
+
+        if (!password) {
+            statusText.textContent = "Please enter your password";
+            return;
+        }
+
+        statusText.textContent = "🔄 Syncing... Please wait.";
+
+        ipcRenderer.send("sync-pull", {password});
+    });
+
+    document.getElementById("syncBoth").addEventListener("click", () => {
+
+        const statusText = document.getElementById("syncStatus");
+        const password = document.getElementById("passwordInput").value;
+
+        if (!password) {
+            statusText.textContent = "Please enter your password";
+            return;
+        }
+
+        statusText.textContent = "🔄 Syncing... Please wait.";
+
+        ipcRenderer.send("sync-both", {password});
     });
 
     ipcRenderer.on("sync-status", (event, status) => {
