@@ -3,33 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rsync Electron App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-    </style>
+    <title>File Sync</title>
 </head>
 <body>
-<h1>Welcome to Rsync Electron</h1>
-<p>Click below to start the file sync.</p>
-<button id="syncButton">Start Sync</button>
+<h2>File Sync Using Rsync</h2>
+<button id="selectFile">Select File</button>
+<p id="selectedFile">No file selected</p>
+
+<input type="password" id="passwordInput" placeholder="Enter SSH Password" />
+<button id="syncFile">Sync File</button>
+<p id="syncStatus"></p>
 
 <script>
-    const { ipcRenderer } = require('electron');
+    const { ipcRenderer } = require("electron");
 
-    document.getElementById("syncButton").addEventListener("click", () => {
-        ipcRenderer.send("sync-files");
+    document.getElementById("selectFile").addEventListener("click", () => {
+        ipcRenderer.send("select-file");
     });
 
-    ipcRenderer.on("sync-status", (event, message) => {
-        alert(message);
+    ipcRenderer.on("file-selected", (event, filePath) => {
+        document.getElementById("selectedFile").textContent = `Selected File: ${filePath}`;
+        document.getElementById("selectedFile").dataset.path = filePath;
+    });
+
+    document.getElementById("syncFile").addEventListener("click", () => {
+        const filePath = document.getElementById("selectedFile").dataset.path;
+        const password = document.getElementById("passwordInput").value;
+
+        if (!filePath || !password) {
+            document.getElementById("syncStatus").textContent = "Please select a file and enter a password.";
+            return;
+        }
+
+        ipcRenderer.send("sync-file", { filePath, password });
+    });
+
+    ipcRenderer.on("sync-status", (event, status) => {
+        document.getElementById("syncStatus").textContent = status.message;
     });
 </script>
 </body>

@@ -1,79 +1,46 @@
-/**
- * Created by WebStorm.
- * User: Mehedi Hasan
- * Date: 24 Feb 2025
- * Time: 9:58 AM
- * Email: mdmehedihasanroni28@gmail.com
- */
-
-const { ipcMain } = require("electron");
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { exec } = require("child_process");
-const path = require("path");
-
-// Set your sync source and target (Update these paths)
-const SOURCE_DIR = "/path/to/source"; // Update with your local folder
-const DESTINATION = "user@server:/path/to/destination"; // Update with your remote storage
 
 let mainWindow;
 
-ipcMain.on("sync-files", (event) => {
-    syncFiles();
-    event.reply("sync-status", "Sync started successfully!");
-});
-
-// Function to create the Home Page window
-function createWindow() {
+app.whenReady().then(() => {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true, // Enable if you need to use Node.js in the frontend
+            nodeIntegration: true,
+            contextIsolation: false,
         },
     });
 
-    // Load an HTML file (frontend)
-    mainWindow.loadFile("index.html");
+    mainWindow.loadFile("index.html"); // Load your frontend
+});
 
-    mainWindow.on("closed", () => {
-        mainWindow = null;
+// Handle file selection from renderer process
+ipcMain.on("select-file", async (event) => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ["openFile"], // Allow selecting only one file
     });
-}
 
-// Function to run rsync
-function syncFiles() {
-    const rsyncCommand = `rsync -avz ${SOURCE_DIR} ${DESTINATION}`;
+    if (!result.canceled && result.filePaths.length > 0) {
+        event.reply("file-selected", result.filePaths[0]);
+    }
+});
+
+// Handle rsync transfer from GUI
+ipcMain.on("sync-file", (event, { filePath, password }) => {
+    const DESTINATION = "joniyed@192.168.10.68:/home/joniyed/Downloads/"; // Remote PC
+    const rsyncCommand = `sshpass -p '${password}' rsync -avz '${filePath}' ${DESTINATION}`;
 
     exec(rsyncCommand, (error, stdout, stderr) => {
         if (error) {
-            console.error("Rsync Error:", error.message);
+            event.reply("sync-status", { success: false, message: error.message });
             return;
         }
         if (stderr) {
             console.error("Rsync Stderr:", stderr);
-            return;
         }
         console.log("Rsync Output:", stdout);
+        event.reply("sync-status", { success: true, message: "File synced successfully!" });
     });
-}
-
-// Run on startup
-app.whenReady().then(() => {
-    console.log("Electron App Started...");
-
-    // Show Home Page
-    createWindow();
-
-    // Run rsync immediately
-    syncFiles();
-
-    // Schedule sync every 10 minutes (adjust as needed)
-    setInterval(syncFiles, 10 * 60 * 1000);
-});
-
-// Prevent app from closing
-app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
 });
